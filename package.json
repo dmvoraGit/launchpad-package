@@ -1,18 +1,15 @@
 {
-	"name": "@launchpad",
-	"version": "0.0.1",
+	"name": "@logisticinfotechs/launchpad-package",
+	"version": "0.0.2",
 	"description": "crypto launchpad package for creating ido launchpad",
 	"main": "dist/cjs/index.js",
 	"module": "dist/esm/index.js",
 	"files": [
-		"dist"
+		"dist/**/*"
 	],
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com/dmvoraGit"
-	},
 	"types": "dist/index.d.ts",
 	"scripts": {
-		"rollup": "rollup -c"
+		"prepack": "rollup -c"
 	},
 	"keywords": [],
 	"author": "Divyesh vora",
@@ -25,6 +22,7 @@
 		"react": "^18.2.0",
 		"rollup": "^3.27.0",
 		"rollup-plugin-dts": "^5.3.1",
+		"tslib": "^2.6.1",
 		"typescript": "^5.1.6"
 	},
 	"dependencies": {

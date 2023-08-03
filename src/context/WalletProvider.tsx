@@ -1,6 +1,12 @@
 import { useWeb3React } from "@web3-react/core";
 import { Connector } from "@web3-react/types";
-import React, { FC, ReactNode, createContext, useCallback } from "react";
+import React, {
+	FC,
+	ReactNode,
+	createContext,
+	useCallback,
+	useContext,
+} from "react";
 import { injectedConnection } from "../connection";
 
 interface IWallateState {
@@ -66,4 +72,8 @@ export const WallateProvider: FC<IWallateProviderProps> = ({ children }) => {
 			{children}
 		</WallateContext.Provider>
 	);
+};
+
+export const useWallate = () => {
+	return useContext<IWallateState>(WallateContext);
 };
