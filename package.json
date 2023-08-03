@@ -1,0 +1,32 @@
+{
+	"name": "@launchpad",
+	"version": "0.0.1",
+	"description": "crypto launchpad package for creating ido launchpad",
+	"main": "dist/cjs/index.js",
+	"module": "dist/esm/index.js",
+	"files": [
+		"dist"
+	],
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"rollup": "rollup -c"
+	},
+	"keywords": [],
+	"author": "Divyesh vora",
+	"license": "ISC",
+	"devDependencies": {
+		"@rollup/plugin-commonjs": "^25.0.3",
+		"@rollup/plugin-node-resolve": "^15.1.0",
+		"@rollup/plugin-typescript": "^11.1.2",
+		"@types/react": "^18.2.18",
+		"react": "^18.2.0",
+		"rollup": "^3.27.0",
+		"rollup-plugin-dts": "^5.3.1",
+		"typescript": "^5.1.6"
+	},
+	"dependencies": {
+		"@web3-react/core": "^8.2.0",
+		"@web3-react/metamask": "^8.2.1",
+		"@web3-react/types": "^8.2.0"
+	}
+}
