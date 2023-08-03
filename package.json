@@ -7,6 +7,9 @@
 	"files": [
 		"dist"
 	],
+	"publishConfig": {
+		"registry": "https://npm.pkg.github.com/dmvoraGit"
+	},
 	"types": "dist/index.d.ts",
 	"scripts": {
 		"rollup": "rollup -c"
