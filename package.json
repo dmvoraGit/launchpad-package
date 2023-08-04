@@ -1,9 +1,9 @@
 {
 	"name": "root",
-	"private": true,
 	"workspaces": [
 		"packages/*"
 	],
+	"repository": "github:dmvoraGit/launchpad-package",
 	"scripts": {
 		"clean": "lerna clean --yes",
 		"lint": "npm run eslint --ext .ts,.tsx .",
@@ -22,6 +22,7 @@
 		"typescript": "^5.1.6"
 	},
 	"dependencies": {
+		"@lerna/publish": "^6.6.2",
 		"bignumber.js": "^9.1.1"
 	}
 }
