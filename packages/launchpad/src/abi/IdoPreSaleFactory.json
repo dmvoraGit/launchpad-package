@@ -1,0 +1,296 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_uniswapRouter",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "idoaddress",
+				"type": "address"
+			}
+		],
+		"name": "IdoCreated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"components": [
+					{
+						"internalType": "address",
+						"name": "TokenAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "TokenAllocation",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "TokenRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "SoftCap",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "HardCap",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "MinBuyPerUser",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "MaxBuyPerUser",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "StartTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "EndTime",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "DexListingRate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "LiquidityPC",
+						"type": "uint256"
+					},
+					{
+						"internalType": "bool",
+						"name": "Refund",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "AutoListing",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "UseWhiteList",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct IIdoPresale.IdoPoolInfo",
+				"name": "_idopoolinfo",
+				"type": "tuple"
+			},
+			{
+				"internalType": "address",
+				"name": "raisetokenIn",
+				"type": "address"
+			}
+		],
+		"name": "createIDO",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getDeployedIdos",
+		"outputs": [
+			{
+				"internalType": "address[]",
+				"name": "",
+				"type": "address[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_tokenaddress",
+				"type": "address"
+			}
+		],
+		"name": "getIdoByToken",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "postFeepc",
+		"outputs": [
+			{
+				"internalType": "uint8",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "preFee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address payable",
+				"name": "_feewallet",
+				"type": "address"
+			}
+		],
+		"name": "setFeeWallet",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "_fee",
+				"type": "uint8"
+			}
+		],
+		"name": "setPostFee",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_fee",
+				"type": "uint256"
+			}
+		],
+		"name": "setPreFee",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "uniswapRouter",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]

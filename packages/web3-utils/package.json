@@ -1,0 +1,32 @@
+{
+	"name": "@logisticinfotechs/web3-utils",
+	"version": "0.0.1",
+	"description": "utils functions for web3",
+	"author": "Divyesh <divyeshvora@logisticinfotech.co.in>",
+	"homepage": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"types": "./dist/index.d.ts",
+	"main": "./dist/index.js",
+	"exports": "./dist/index.js",
+	"publishConfig": {
+		"access": "public"
+	},
+	"repository": "github:dmvoraGit/launchpad-package",
+	"directories": {
+		"lib": "lib",
+		"test": "__tests__"
+	},
+	"files": [
+		"dist/*"
+	],
+	"scripts": {
+		"prebuild": "rm -rf dist",
+		"build": "tsc",
+		"start": "tsc --watch"
+	},
+	"dependencies": {
+		"web3": "^1.8.2",
+		"web3-utils": "^1.8.2"
+	}
+}

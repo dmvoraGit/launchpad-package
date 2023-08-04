@@ -1,0 +1,10 @@
+import { ContractContext as ERC20Context } from "../contract-types/ERC20";
+import { ContractContext as PRESALEFACORYContext } from "../contract-types/IdoPreSaleFactory";
+import { ContractContext as FAIRLAUNCHFACTORYContext } from "../contract-types/FairLaunchFactory";
+import { ContractContext as PRESALEContext } from "../contract-types/IdoPresale";
+import { ContractContext as FAIRLAUNCHContext } from "../contract-types/FairLaunch";
+export declare const getErc20Contract: (address: string) => ERC20Context;
+export declare const getPresaleFactoryContract: (address: string) => PRESALEFACORYContext;
+export declare const getFairLaunchFactoryContract: (address: string) => FAIRLAUNCHFACTORYContext;
+export declare const getPresaleContract: (address: string) => PRESALEContext;
+export declare const getFairlaunchContract: (address: string) => FAIRLAUNCHContext;
