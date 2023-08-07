@@ -1,6 +1,6 @@
 {
 	"name": "@logisticinfotechs/launchpad",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "crypto launchpad package for creating ido launchpad",
 	"author": "Divyesh <divyeshvora@logisticinfotech.co.in>",
 	"homepage": "",
@@ -28,7 +28,7 @@
 		"genrate-erc20-types": "abi-types-generator ./src/abi/ERC20.json --output=./src/contract-types --provider=web3"
 	},
 	"dependencies": {
-		"@logisticinfotechs/web3-utils": "^0.0.1",
+		"@logisticinfotechs/web3-utils": "^0.0.2",
 		"@web3-react/core": "^8.2.0",
 		"@web3-react/metamask": "^8.2.1",
 		"@web3-react/types": "^8.2.0",
