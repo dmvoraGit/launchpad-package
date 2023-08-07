@@ -6,14 +6,9 @@ import React, {
 	useEffect,
 	useReducer,
 } from "react";
+import { Action, ActionType } from "./actions-types";
 import {
-	Action,
-	ActionType,
-	ContractAddresses,
-	CreateIdoPayload,
-	OfferType,
-} from "./actions-types";
-import {
+	getErc20Contract,
 	getFairLaunchFactoryContract,
 	getFairlaunchContract,
 	getPresaleContract,
@@ -28,6 +23,15 @@ import {
 } from "@logisticinfotechs/web3-utils";
 import { CreateIDORequest } from "../contract-types/IdoPreSaleFactory";
 import { CreateIDORequest as FairlaunchRequest } from "../contract-types/FairLaunchFactory";
+import {
+	AllowanceParams,
+	BuyToken,
+	ContractAddresses,
+	CreateIdoPayload,
+	IdoDetailsParams,
+	OfferType,
+	PoolInfoType,
+} from "./types";
 
 interface IIDoState {
 	loading?: boolean;
@@ -38,13 +42,11 @@ interface IIDoState {
 		result: any;
 	};
 	error?: null | string;
-	postFee?: any;
-	preFee?: any;
+	postFee?: string | null;
+	preFee?: string;
 	contractAddress?: ContractAddresses | null;
-	poolInfo?: any;
-	idoAddress?: string | null;
-	idoType?: string | null;
-	account?: string;
+	poolInfo?: PoolInfoType;
+	allowance?: string;
 }
 
 export enum TRANSACTIONSTATUS {
@@ -56,6 +58,7 @@ export enum TRANSACTIONSTATUS {
 export enum TRANSACTIONTYPE {
 	CREATEIDO = "CREATEIDO",
 	APPROVE = "APPROVE",
+	BUYTOKEN = "BUYTOKEN",
 }
 
 const IdoContext = createContext({});
@@ -71,12 +74,9 @@ export const IdoProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		},
 		error: null,
 		postFee: null,
-		preFee: null,
+		preFee: "0",
 		contractAddress: null,
-		poolInfo: {},
-		idoAddress: null,
-		idoType: null,
-		account: "",
+		allowance: "0",
 	};
 
 	const reducer = (state: IIDoState, action: Action) => {
@@ -119,10 +119,10 @@ export const IdoProvider: FC<{ children: ReactNode }> = ({ children }) => {
 					},
 				};
 			}
-			case ActionType.SETIDODETAILS: {
+			case ActionType.SETALLOWANCE: {
 				return {
 					...state,
-					...action.payload,
+					allowance: action.payload,
 				};
 			}
 			default:
@@ -141,51 +141,137 @@ export const IdoProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		});
 	};
 
-	const setIdoDetails = ({
-		idoAddress,
-		idoType,
-		account,
-	}: {
-		idoAddress?: string;
-		idoType?: string;
-		account?: string;
-	}) => {
-		dispatch({
-			type: ActionType.SETIDODETAILS,
-			payload: {
-				idoAddress,
-				idoType,
-				account,
-			},
-		});
-	};
-
-	const getIdoDetails = async () => {
+	const checkAllowance = async ({
+		tokenAddress,
+		ownwer,
+		spender,
+	}: AllowanceParams) => {
 		try {
 			dispatch({
 				type: ActionType.STARTLOADING,
 			});
-			if (!state.idoAddress || !state.account || !state.idoType) return;
+			const _contract = getErc20Contract(tokenAddress);
+			const result = await _contract.methods
+				.allowance(ownwer, spender)
+				.call();
+			dispatch({
+				type: ActionType.SETALLOWANCE,
+				payload: result?.toString() || "0",
+			});
+		} catch (err) {
+			console.log("err", err);
+		} finally {
+			dispatch({
+				type: ActionType.STOPLOADING,
+			});
+		}
+	};
+
+	const approveToken = async ({
+		tokenAddress,
+		ownwer,
+		spender,
+		amount,
+	}: AllowanceParams & {
+		amount: string;
+	}) => {
+		try {
+			dispatch({
+				type: ActionType.STARTLOADING,
+			});
+			const _contract = getErc20Contract(tokenAddress);
+			await _contract.methods
+				.approve(spender, amount)
+				.send({ from: ownwer }, function (error, transactionHash) {
+					if (error) {
+						dispatch({
+							type: ActionType.STARTLOADING,
+						});
+						dispatch({
+							type: ActionType.SETTRANSACTION,
+							payload: {
+								type: TRANSACTIONTYPE.APPROVE,
+								hash: null,
+								status: TRANSACTIONSTATUS.FAILED,
+								result: {},
+							},
+						});
+					} else {
+						dispatch({
+							type: ActionType.SETTRANSACTION,
+							payload: {
+								type: TRANSACTIONTYPE.APPROVE,
+								hash: transactionHash,
+								status: TRANSACTIONSTATUS.PENDING,
+								result: {},
+							},
+						});
+					}
+				})
+				.on("receipt", async function (receipt) {
+					console.log("receipt", receipt);
+					dispatch({
+						type: ActionType.SETTRANSACTION,
+						payload: {
+							type: TRANSACTIONTYPE.APPROVE,
+							hash: null,
+							status: TRANSACTIONSTATUS.SUCCESS,
+							result: receipt,
+						},
+					});
+					await checkAllowance({ tokenAddress, ownwer, spender });
+				})
+				.on("error", async function (error) {
+					console.log("error", error);
+					dispatch({
+						type: ActionType.SETTRANSACTION,
+						payload: {
+							type: TRANSACTIONTYPE.APPROVE,
+							hash: null,
+							status: TRANSACTIONSTATUS.FAILED,
+							result: null,
+						},
+					});
+				});
+		} catch (err) {
+			console.log("err", err);
+		} finally {
+			dispatch({
+				type: ActionType.STARTLOADING,
+			});
+		}
+	};
+
+	const getIdoDetails = async ({
+		idoAddress,
+		account,
+		idoType,
+	}: IdoDetailsParams) => {
+		try {
+			dispatch({
+				type: ActionType.STARTLOADING,
+			});
+			if (!idoAddress || !account || !idoType) return;
 			let _idoContract;
 			let totalTokenSold;
-			if (state.idoType === OfferType.PRESALE) {
-				_idoContract = getPresaleContract(state.idoAddress);
+			if (idoType === OfferType.PRESALE) {
+				_idoContract = getPresaleContract(idoAddress);
 				totalTokenSold = await _idoContract.methods
 					.totalTokenSold()
 					.call();
 			} else {
-				_idoContract = getFairlaunchContract(state.idoAddress);
+				_idoContract = getFairlaunchContract(idoAddress);
 			}
-			const [totalRaised, pool, userInfo] = await Promise.all([
+			const [valueRaised, pool, userInfo] = await Promise.all([
 				_idoContract.methods.valueRaised().call(),
 				_idoContract.methods.getIdoDetails().call(),
-				_idoContract.methods.userRecord(state.account).call(),
+				_idoContract.methods.userRecord(account).call(),
 			]);
 
 			dispatch({
 				type: ActionType.SETPOOL,
 				payload: {
-					totalRaised,
+					valueRaised,
 					totalTokenSold,
 					pool: { ...pool },
 					userInfo,
@@ -413,23 +499,165 @@ export const IdoProvider: FC<{ children: ReactNode }> = ({ children }) => {
 		}
 	};
 
-	useEffect(() => {
-		getIdoDetails();
-	}, [state.account, state.idoAddress, state.idoType]);
+	const buyToken = async (payload: BuyToken) => {
+		try {
+			dispatch({ type: ActionType.STARTLOADING });
+			let _contract;
+			if (payload.type === OfferType.PRESALE) {
+				_contract = getPresaleContract(payload.idoAddress);
+			} else {
+				_contract = getFairlaunchContract(payload.idoAddress);
+			}
 
-	return (
-		<IdoContext.Provider
-			value={{
-				...initialState,
-				setContractAddress,
-				createIdo,
-				getIdoDetails,
-				setIdoDetails,
-			}}
-		>
-			{children}
-		</IdoContext.Provider>
-	);
+			if (payload.tokenType === "stable") {
+				const _erc20Contract = getErc20Contract(payload.tokenAddress);
+				const decimal = await _erc20Contract.methods.decimals().call();
+
+				await _contract.methods
+					.buyTokens(toWei(payload.amount, Number(decimal)))
+					.send(
+						{ from: payload.account },
+						function (error, transactionHash) {
+							if (error) {
+								dispatch({
+									type: ActionType.STOPLOADING,
+								});
+								dispatch({
+									type: ActionType.SETTRANSACTION,
+									payload: {
+										type: TRANSACTIONTYPE.BUYTOKEN,
+										hash: null,
+										status: TRANSACTIONSTATUS.FAILED,
+										result: {},
+									},
+								});
+							} else {
+								dispatch({
+									type: ActionType.SETTRANSACTION,
+									payload: {
+										type: TRANSACTIONTYPE.BUYTOKEN,
+										hash: transactionHash,
+										status: TRANSACTIONSTATUS.PENDING,
+										result: {},
+									},
+								});
+							}
+						}
+					)
+					.on("receipt", async function (receipt) {
+						console.log("receipt", receipt);
+						dispatch({
+							type: ActionType.SETTRANSACTION,
+							payload: {
+								type: TRANSACTIONTYPE.BUYTOKEN,
+								hash: null,
+								status: TRANSACTIONSTATUS.SUCCESS,
+								result: receipt,
+							},
+						});
+					})
+					.on("error", async function (error) {
+						console.log("error", error);
+						dispatch({
+							type: ActionType.SETTRANSACTION,
+							payload: {
+								type: TRANSACTIONTYPE.BUYTOKEN,
+								hash: null,
+								status: TRANSACTIONSTATUS.FAILED,
+								result: null,
+							},
+						});
+					});
+			} else if (payload.tokenType === "native") {
+				await _contract.methods
+					.buyTokensWithNative()
+					.send(
+						{ from: payload.account },
+						function (error, transactionHash) {
+							if (error) {
+								dispatch({
+									type: ActionType.STOPLOADING,
+								});
+								dispatch({
+									type: ActionType.SETTRANSACTION,
+									payload: {
+										type: TRANSACTIONTYPE.BUYTOKEN,
+										hash: null,
+										status: TRANSACTIONSTATUS.FAILED,
+										result: {},
+									},
+								});
+							} else {
+								dispatch({
+									type: ActionType.SETTRANSACTION,
+									payload: {
+										type: TRANSACTIONTYPE.BUYTOKEN,
+										hash: transactionHash,
+										status: TRANSACTIONSTATUS.PENDING,
+										result: {},
+									},
+								});
+							}
+						}
+					)
+					.on("receipt", async function (receipt) {
+						console.log("receipt", receipt);
+						dispatch({
+							type: ActionType.SETTRANSACTION,
+							payload: {
+								type: TRANSACTIONTYPE.BUYTOKEN,
+								hash: null,
+								status: TRANSACTIONSTATUS.SUCCESS,
+								result: receipt,
+							},
+						});
+					})
+					.on("error", async function (error) {
+						console.log("error", error);
+						dispatch({
+							type: ActionType.SETTRANSACTION,
+							payload: {
+								type: TRANSACTIONTYPE.BUYTOKEN,
+								hash: null,
+								status: TRANSACTIONSTATUS.FAILED,
+								result: null,
+							},
+						});
+					});
+			}
+		} catch (err: any) {
+			const parsedError = JSON.stringify(err.message);
+			if (parsedError.includes("reverted with reason ")) {
+				console.log("revertedError(err)", revertedError(err));
+			}
+			console.log("err.message", err.message);
+		}
+	};
+
+	interface ProviderValue extends IIDoState {
+		setContractAddress(payload: ContractAddresses): void;
+		createIdo(payload: CreateIdoPayload): Promise<void>;
+		getIdoDetails(payload: IdoDetailsParams): Promise<void>;
+		checkAllowance(payload: AllowanceParams): Promise<void>;
+		approveToken(
+			payload: AllowanceParams & {
+				amount: string;
+			}
+		): Promise<void>;
+		buyToken(payload: BuyToken): Promise<void>;
+	}
+
+	const values: ProviderValue = {
+		...initialState,
+		setContractAddress,
+		createIdo,
+		getIdoDetails,
+		checkAllowance,
+		approveToken,
+		buyToken,
+	};
+
+	return <IdoContext.Provider value={values}>{children}</IdoContext.Provider>;
 };
 
 export const useIdoHook = () => {

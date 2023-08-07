@@ -28,7 +28,7 @@
 		"genrate-erc20-types": "abi-types-generator ./src/abi/ERC20.json --output=./src/contract-types --provider=web3"
 	},
 	"dependencies": {
-		"@logisticinfotechs/web3-utils": "file:../web3-utils",
+		"@logisticinfotechs/web3-utils": "^0.0.1",
 		"@web3-react/core": "^8.2.0",
 		"@web3-react/metamask": "^8.2.1",
 		"@web3-react/types": "^8.2.0",
